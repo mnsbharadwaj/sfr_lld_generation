@@ -1,0 +1,11 @@
+diff --git a/sfr_old.h b/sfr_new.h
+--- a/sfr_old.h
++++ b/sfr_new.h
+@@ -3,8 +3,8 @@
+ #define DMA_CTRL_OFFSET              0x0000U
+-#define DMA_CTRL_START_MASK          0x00000001U
+-#define DMA_CTRL_START_SHIFT         0U
++#define DMA_CTRL_START_MASK          0x00000002U
++#define DMA_CTRL_START_SHIFT         1U
+ #define DMA_CTRL_ENABLE_MASK         0x00000004U
+ #define DMA_CTRL_ENABLE_SHIFT        2U
