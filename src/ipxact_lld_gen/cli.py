@@ -23,6 +23,10 @@ def main(argv=None):
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     fields = parse_excel(args.excel)
+    
+    # Filter out fields marked as debug in description
+    fields = [f for f in fields if "debug" not in f.description.lower()]
+    
     defines = parse_defines(args.sfr_header)
     macro_map = {f.key: correlate_field_macros(defines, f.ip, f.reg, f.field) for f in fields}
     decls, sem_report = generate_expected_decls(fields, macro_map, llm_config_path=args.llm_config)
@@ -44,6 +48,13 @@ def main(argv=None):
         result["patched_lld"] = str(patched_path)
         result["patch_report"] = patch_report
         (out / "patch_report.json").write_text(json.dumps(patch_report, indent=2), encoding="utf-8")
+    else:
+        # First-time generation mode
+        lld_path = out / "lld.h"
+        lld_path.write_text(render_lld_header(decls, sfr_include=Path(args.sfr_header).name), encoding="utf-8")
+        result["lld"] = str(lld_path)
+        result["mode"] = "first_time_generation"
+
     (out / "run_report.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
     print(json.dumps(result, indent=2))
 
