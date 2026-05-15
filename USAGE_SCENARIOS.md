@@ -93,3 +93,21 @@ python -m ipxact_lld_gen.cli `
 **Verification:**
 - `patched_lld.h` or `lld.h` will contain the custom functions returned directly by the AI model.
 - Check the console output; if the LLM server is down, it will log a timeout warning and fallback to the standard generation.
+
+### Modifying the LLM API Integration
+
+If you need to change how the AI model API is called (for example, to add Authentication tokens, change the JSON payload structure, or adjust the prompt), you need to modify the LLM client source code.
+
+**File to Modify:** `src/ipxact_lld_gen/generator/llm_client.py`
+
+**Key areas to update in the code:**
+1. **The Prompt:** Look for the `prompt = f"""..."""` variable in `generate_lld_function()`. You can adjust the instructions given to the LLM to better format the generated C code.
+2. **The JSON Payload:** Look for the `data = { ... }` dictionary. If your API requires different keys (like `max_tokens` instead of `temperature`, or specific nested structures), edit them here.
+3. **Authentication Headers:** Look for the `headers={'Content-Type': 'application/json'}` line in the `urllib.request.Request` call. If your API (like OpenAI or a secure local server) requires a Bearer token, update it to:
+   ```python
+   headers={
+       'Content-Type': 'application/json',
+       'Authorization': 'Bearer YOUR_API_KEY' # Or load this from llm_config.json
+   }
+   ```
+4. **Parsing the Response:** Look at `result["choices"][0]["message"]["content"]`. If you switch to an API that isn't strictly OpenAI-compatible, you will need to adjust the dictionary keys to correctly extract the generated text from the response.
